@@ -13,22 +13,26 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 
-# Obtener datos de todos los eventos
+# Get all events data
 
 GET		/events						controllers.EventController.listEvents
 
-# Obtener datos de un evento
+# Get specific event data
 
 GET		/event/:id						controllers.EventController.getEvent(id: Long)
 
-# Elminar datos de un evento
+# Remove specific event data
 
 DELETE		/event/:id						controllers.EventController.removeEvent(id: Long)
 
-# Crear un evento
+# Create an event
 
 POST		/events						controllers.EventController.createEvent
 
-# Actualizar datos de un evento
+# Update specific event data
 
 PUT		/event/:id						controllers.EventController.updateEvent(id: Long)
+
+# Comment an event
+
+POST /event/:id/comment						controllers.EventController.commentEvent(id: Long)

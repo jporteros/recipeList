@@ -1,51 +1,38 @@
 package models;
 
-import java.sql.Timestamp;
-
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.validation.Valid;
 
-import com.avaje.ebean.Model;
-import com.avaje.ebean.annotation.CreatedTimestamp;
 import com.avaje.ebean.annotation.JsonIgnore;
-import com.avaje.ebean.annotation.UpdatedTimestamp;
 
+import play.data.validation.Constraints.Max;
+import play.data.validation.Constraints.Min;
+import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Required;
 
 @Entity
-public class Comment extends Model{
-	
-	@Id
-	private Long id;
+public class Comment extends BaseModel{
 	
 	@Required
+	@MinLength(3)
 	private String author;
 	
 	@Required
+	@Min(0)
+	@Max(5)
 	private Integer stars;
 	
 	@Required
+	@MinLength(2)
 	private String body;
-	
-	@CreatedTimestamp
-	Timestamp whenCreated;
-	
-	@UpdatedTimestamp
-	Timestamp whenUpdate;
 	
 	@ManyToOne
 	@JsonIgnore
 	public Event event;
-	
-	public Long getId() {
-		return id;
-	}
 
-	public void setId(Long id) {
-		this.id = id;
-	}
 
+	/*GETTERS AND SETTERS*/
 	public String getAuthor() {
 		return author;
 	}
@@ -69,7 +56,4 @@ public class Comment extends Model{
 	public void setBody(String body) {
 		this.body = body;
 	}
-	
-	
-
 }
