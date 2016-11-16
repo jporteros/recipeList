@@ -3,14 +3,15 @@ package controllers;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.Event;
 import play.mvc.Controller;
 import play.mvc.Result;
 
 public class EventController extends Controller{
 	
-	private List<String> events= new ArrayList<>();
+	private List<Event> events= new ArrayList<>();
 
-	public Result getEvent (Integer id){
+	public Result getEvent (Long id){
 		
 		return ok("getEvent");
 	}
@@ -18,15 +19,15 @@ public class EventController extends Controller{
 			
 		return ok("listEvents");
 	}
-	public Result removeEvent (Integer id){
+	public Result removeEvent (Long id){
 		
 		return ok("removeEvent");
 	}
 	public Result createEvent (){
 			
-			return ok("createEvent");
+		return ok("createEvent");
 	}
-	public Result updateEvent (Integer id){
+	public Result updateEvent (Long id){
 		
 		return ok("updateEvent");
 	}
