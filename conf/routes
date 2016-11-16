@@ -11,3 +11,24 @@ GET     /message                    controllers.AsyncController.message
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+
+# Obtener datos de todos los eventos
+
+GET		/events						controllers.EventController.listEvents
+
+# Obtener datos de un evento
+
+GET		/event/:id						controllers.EventController.getEvent(id: Int)
+
+# Elminar datos de un evento
+
+DELETE		/event/:id						controllers.EventController.removeEvent(id: Int)
+
+# Crear un evento
+
+POST		/events						controllers.EventController.createEvent
+
+# Actualizar datos de un evento
+
+PUT		/event/:id						controllers.EventController.updateEvent(id: Int)
