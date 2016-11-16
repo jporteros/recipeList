@@ -1,12 +1,17 @@
 package models;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.UpdatedTimestamp;
 
 import play.data.validation.Constraints.Required;
 
@@ -29,7 +34,25 @@ public class Event extends Model{
 	@Required
 	private String author;
 	
+	@CreatedTimestamp
+	Timestamp whenCreated;
 	
+	@UpdatedTimestamp
+	Timestamp whenUpdate;
+	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy="event")
+	//@JsonIgnore
+	public List<Comment> eventComment;
+	
+	
+
+	public List<Comment> getEventComment() {
+		return eventComment;
+	}
+
+	public void setEventComment(List<Comment> eventComment) {
+		this.eventComment = eventComment;
+	}
 
 	public Long getId() {
 		return id;

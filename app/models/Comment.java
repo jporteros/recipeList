@@ -1,9 +1,15 @@
 package models;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 
 import com.avaje.ebean.Model;
+import com.avaje.ebean.annotation.CreatedTimestamp;
+import com.avaje.ebean.annotation.JsonIgnore;
+import com.avaje.ebean.annotation.UpdatedTimestamp;
 
 import play.data.validation.Constraints.Required;
 
@@ -21,7 +27,17 @@ public class Comment extends Model{
 	
 	@Required
 	private String body;
-
+	
+	@CreatedTimestamp
+	Timestamp whenCreated;
+	
+	@UpdatedTimestamp
+	Timestamp whenUpdate;
+	
+	@ManyToOne
+	@JsonIgnore
+	public Event event;
+	
 	public Long getId() {
 		return id;
 	}
