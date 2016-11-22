@@ -27,7 +27,7 @@ public class Event extends BaseModel{
 	@Required
 	@OneToOne(cascade = CascadeType.ALL)
 	@Valid
-	private Organiser Organiser;
+	private Organiser organiser;
 	
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="event")
 	/* TO DO ask for the Behaviour of @Valid when applied to items in a List */
@@ -85,11 +85,13 @@ public class Event extends BaseModel{
 	}
 
 	public Organiser getOrganiser() {
-		return Organiser;
+		return organiser;
 	}
 
 	public void setOrganiser(Organiser organiser) {
-		Organiser = organiser;
+		this.organiser = organiser;
 	}
+
+	
 	
 }
