@@ -9,7 +9,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 import play.data.validation.Constraints.Required;
+import play.libs.Json;
 
 @Entity
 public class Event extends BaseModel{
@@ -24,7 +27,7 @@ public class Event extends BaseModel{
 	@Required 
 	private String type;
 	
-	@Required
+	//@Required
 	@OneToOne(cascade = CascadeType.ALL)
 	@Valid
 	private Organiser organiser;
@@ -90,6 +93,10 @@ public class Event extends BaseModel{
 
 	public void setOrganiser(Organiser organiser) {
 		this.organiser = organiser;
+	}
+	public JsonNode toJson(){
+		return Json.toJson(this);
+		 
 	}
 
 	
