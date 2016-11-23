@@ -9,6 +9,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import play.data.validation.Constraints.Required;
@@ -16,10 +17,13 @@ import play.libs.Json;
 
 @Entity
 public class Event extends BaseModel{
+	public static Integer eventsPerPage = 10;
+	
 	@Required
 	private String name;
 	
-	private List<Date> dates;
+	/*TODO fix the problem with dates when any find method triggers*/
+	//private List<Date> dates;
 	
 	@Required
 	private String description;
@@ -33,8 +37,9 @@ public class Event extends BaseModel{
 	private Organiser organiser;
 	
 	@OneToMany(cascade=CascadeType.ALL, mappedBy="event")
-	/* TO DO ask for the Behaviour of @Valid when applied to items in a List */
-	public List<Comment> eventComment;
+	//@JsonIgnore
+	/* TODO ask for the Behaviour of @Valid when applied to items in a List */
+	public List<Comment> eventComments;
 	
 	private static final Find<Long,Event> find =  new Find<Long,Event>(){};
 	
@@ -42,17 +47,19 @@ public class Event extends BaseModel{
 		return find.where().eq("id", id).findUnique();
 	}
 	
-	public static List<Event> findPage(Integer page, Integer count){
-		return find.setFirstRow(page*count).setMaxRows(count).findList();
+	public static List<Event> findPage(Integer page){
+		/*First events will be shown in page 0*/
+		/*TODO order by date*/
+		return find.setFirstRow((page*eventsPerPage)).setMaxRows(eventsPerPage).findList();
 	}
 
 	/*GETTERS AND SETTERS*/
-	public List<Comment> getEventComment() {
-		return eventComment;
+	public List<Comment> getEventComments() {
+		return eventComments;
 	}
 
-	public void setEventComment(List<Comment> eventComment) {
-		this.eventComment = eventComment;
+	public void setEventComments(List<Comment> eventComment) {
+		this.eventComments = eventComment;
 	}
 
 	public String getName() {
@@ -62,15 +69,16 @@ public class Event extends BaseModel{
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
+	/*
 	public List<Date> getDates() {
-		return dates;
+		return this.dates;
 	}
 
 	public void setDates(List<Date> dates) {
 		this.dates = dates;
 	}
-
+	*/
 	public String getDescription() {
 		return description;
 	}
@@ -96,7 +104,6 @@ public class Event extends BaseModel{
 	}
 	public JsonNode toJson(){
 		return Json.toJson(this);
-		 
 	}
 
 	

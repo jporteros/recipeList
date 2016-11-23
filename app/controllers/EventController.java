@@ -1,13 +1,17 @@
 package controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import models.Comment;
 import models.Event;
 import play.data.Form;
 import play.data.FormFactory;
+import play.db.ebean.Transactional;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Results;
@@ -15,11 +19,14 @@ import play.mvc.Results;
 public class EventController extends Controller {
 	@Inject
 	FormFactory formFactory;
-	private List<Event> events = new ArrayList<>();
 
 	public Result getEvent(Long id) {
+		Event event = Event.findById(id);
+		if (event == null)
+			return notFound();
+
 		if (request().accepts("application/json")) {
-			return ok("getEventJSON");
+			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
 			return ok("getEventXML");
 		} else {
@@ -27,9 +34,13 @@ public class EventController extends Controller {
 		}
 	}
 
-	public Result listEvents() {
+	public Result listEvents(Integer page) {
+		List<Event> events = Event.findPage(page);
+		if (events == null)
+			return notFound();
+
 		if (request().accepts("application/json")) {
-			return ok("listEventsJSON");
+			return ok(EventController.createEventListNode(events));
 		} else if (request().accepts("application/xml")) {
 			return ok("listEventsXML");
 		} else {
@@ -38,52 +49,38 @@ public class EventController extends Controller {
 	}
 
 	public Result removeEvent(Long id) {
-		if (request().accepts("application/json")) {
-			return ok("removeEventJSON");
-		} else if (request().accepts("application/xml")) {
-			return ok("removeEventXML");
-		} else {
-			return ok("removeEventNotAcceptable");
+		Event event = Event.findById(Long.valueOf(id));
+		if (event == null) {
+			return Results.notFound();
 		}
-		
-		 
-	/*	if(id>= events.size()){
-			 System.out.println("id incorrecto");
-			 return Results.notFound();
-		 }
-		 
-		 Event event= event.findById(id);
-		 if(event== null){
-			 return notFound();//retorna 404
-		 }
-		 if(event.delete()){
-			 cache.remove("event-"+id);
-			 return ok();
-		 }
-		 else{
-			 return Results.internalServerError();
-		 }
-	*/
+		if (event.delete()) {
+			if (request().accepts("application/json")) {
+				return ok("removeEventJSON");
+			} else if (request().accepts("application/xml")) {
+				return ok("removeEventXML");
+			} else {
+				return ok("removeEventNotAcceptable");
+			}
+		} else
+			return Results.internalServerError();
 	}
 
 	public Result createEvent() {
-		/*if (request().accepts("application/json")) {
-			return ok("createEventJSON");
+		Form<Event> f = formFactory.form(Event.class).bindFromRequest();
+		if (f.hasErrors()) {
+			//TODO create different types of error for json and xml
+			return Results.badRequest(f.errorsAsJson());
+		}
+		Event event = f.get();
+		event.save();
+
+		if (request().accepts("application/json")) {
+			return Results.status(CREATED, event.toJson());
 		} else if (request().accepts("application/xml")) {
 			return ok("createEventXML");
 		} else {
 			return ok("createEventNotAcceptable");
-		}*/
-		 Form<Event> f = formFactory.form(Event.class).bindFromRequest();
-		 
-		 if(f.hasErrors()){
-			 //f.errorsAsJson
-			 return Results.badRequest(f.errorsAsJson());
-		 }
-		 Event event= f.get();
-		 event.save();
-		
-		 return Results.status(CREATED, event.toJson());
+		}
 	}
 
 	public Result updateEvent(Long id) {
@@ -96,14 +93,38 @@ public class EventController extends Controller {
 		}
 	}
 	
+	@Transactional
 	public Result commentEvent(Long id) {
+		Form<Comment> f = formFactory.form(Comment.class).bindFromRequest();
+		if (f.hasErrors()) {
+			//TODO create different types of error for Json and XML
+			return Results.badRequest(f.errorsAsJson());
+		}
+		Event event = Event.findById(id);
+		if(event == null)
+			return notFound();
+		Comment comment=f.get();
+		event.getEventComments().add(comment);
+		comment.setEvent(event);
+		event.save();
+		
 		if (request().accepts("application/json")) {
-			return ok("commentEventJSON");
+			return ok("commentEventJSON"+event.toJson());
 		} else if (request().accepts("application/xml")) {
 			return ok("commentEventXML");
 		} else {
 			return ok("commentEventNotAcceptable");
 		}
+	}
+
+	public static ObjectNode createEventListNode(List<Event> events) {
+		ArrayNode array = play.libs.Json.newArray();
+		ObjectNode node = play.libs.Json.newObject();
+		for (Event e : events) {
+			array.add(e.toJson());
+		}
+		node.set("events", array);
+		return node;
 	}
 
 }

@@ -13,9 +13,9 @@ GET     /message                    controllers.AsyncController.message
 GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
 
 
-# Get all events data
+# Get events data
 
-GET		/events						controllers.EventController.listEvents
+GET		/events/:page						controllers.EventController.listEvents(page: Int)
 
 # Get specific event data
 

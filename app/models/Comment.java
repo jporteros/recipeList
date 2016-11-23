@@ -12,27 +12,25 @@ import play.data.validation.Constraints.MinLength;
 import play.data.validation.Constraints.Required;
 
 @Entity
-public class Comment extends BaseModel{
-	
+public class Comment extends BaseModel {
+
 	@Required
 	@MinLength(3)
 	private String author;
-	
-	@Required
+
 	@Min(0)
 	@Max(5)
 	private Integer stars;
-	
+
 	@Required
 	@MinLength(2)
 	private String body;
-	
+
 	@ManyToOne
 	@JsonIgnore
-	public Event event;
+	private Event event;
 
-
-	/*GETTERS AND SETTERS*/
+	/* GETTERS AND SETTERS */
 	public String getAuthor() {
 		return author;
 	}
@@ -55,5 +53,9 @@ public class Comment extends BaseModel{
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 }
