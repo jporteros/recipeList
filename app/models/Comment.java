@@ -1,5 +1,7 @@
 package models;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.Valid;
@@ -57,5 +59,9 @@ public class Comment extends BaseModel {
 
 	public void setEvent(Event event) {
 		this.event = event;
+	}
+	
+	public String getDate(){
+		return this.whenUpdate.toString();
 	}
 }

@@ -24,7 +24,7 @@ public class Event extends BaseModel {
 	@Required
 	private String name;
 
-	@Formats.DateTime(pattern = "dd-MM-yyyy HH:mm:ss")
+	@Formats.DateTime(pattern = "dd-MM-yyyy HH:mm:SSS")
 	public Date eventDate = new Date();
 
 	@Required
