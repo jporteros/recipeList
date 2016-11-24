@@ -1,58 +1,63 @@
 package models;
 
-import java.util.Date;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
+import javax.swing.text.DateFormatter;
+
+import play.data.format.*;
+
 import javax.validation.Valid;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import play.data.validation.Constraints.Required;
 import play.libs.Json;
 
 @Entity
-public class Event extends BaseModel{
-	public static Integer eventsPerPage = 10;
-	
+public class Event extends BaseModel {
+	private static Integer eventsPerPage = 10;
+	private static SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+
 	@Required
 	private String name;
-	
-	/*TODO fix the problem with dates when any find method triggers*/
-	//private List<Date> dates;
+
+	@Formats.DateTime(pattern = "dd-MM-yyyy HH:mm:ss")
+	public Date eventDate = new Date();
+
 	@Required
 	private String description;
-	
+
 	@Required
 	private String type;
-	
-	//@Required
+
+	@Required
 	@OneToOne(cascade = CascadeType.ALL)
 	@Valid
 	private Organiser organiser;
-	
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="event")
-	//@JsonIgnore
+
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
+	// @JsonIgnore
 	/* TODO ask for the Behaviour of @Valid when applied to items in a List */
 	public List<Comment> eventComments;
-	
-	private static final Find<Long,Event> find =  new Find<Long,Event>(){};
-	
-	public static Event findById(Long id){
+
+	private static final Find<Long, Event> find = new Find<Long, Event>() {
+	};
+
+	public static Event findById(Long id) {
 		return find.where().eq("id", id).findUnique();
 	}
-	
-	public static List<Event> findPage(Integer page){
-		/*First events will be shown in page 0*/
-		/*TODO order by date*/
-		return find.setFirstRow((page*eventsPerPage)).setMaxRows(eventsPerPage).findList();
+
+	public static List<Event> findPage(Integer page) {
+		/* First events will be shown in page 0 */
+		/* TODO order by date */
+		return find.setFirstRow((page * eventsPerPage))
+				.setMaxRows(eventsPerPage).findList();
 	}
 
-	/*GETTERS AND SETTERS*/
+	/* GETTERS AND SETTERS */
 	public List<Comment> getEventComments() {
 		return eventComments;
 	}
@@ -68,16 +73,7 @@ public class Event extends BaseModel{
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	/*
-	public List<Date> getDates() {
-		return this.dates;
-	}
 
-	public void setDates(List<Date> dates) {
-		this.dates = dates;
-	}
-	*/
 	public String getDescription() {
 		return description;
 	}
@@ -101,10 +97,19 @@ public class Event extends BaseModel{
 	public void setOrganiser(Organiser organiser) {
 		this.organiser = organiser;
 	}
-	public JsonNode toJson(){
-		return Json.toJson(this);
+
+	public Date getEventDate() {
+		return eventDate;
 	}
 
+	public void setEventDate(Date eventDate) {
+		this.eventDate = eventDate;
+	}
 	
-	
+	public JsonNode toJson() {
+		ObjectNode node = (ObjectNode) Json.toJson(this);
+		node.put("eventDate", df.format(eventDate));
+		return node;
+	}
+
 }

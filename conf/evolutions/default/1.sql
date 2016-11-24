@@ -19,6 +19,7 @@ create sequence comment_seq;
 create table event (
   id                            bigint not null,
   name                          varchar(255),
+  event_date                    timestamp,
   description                   varchar(255),
   type                          varchar(255),
   organiser_id                  bigint,
