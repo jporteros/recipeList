@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.avaje.ebean.Ebean;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -38,7 +39,6 @@ public class EventController extends Controller {
 		List<Event> events = Event.findPage(page);
 		if (events == null)
 			return notFound();
-
 		if (request().accepts("application/json")) {
 			return ok(EventController.createEventListNode(events));
 		} else if (request().accepts("application/xml")) {
@@ -84,8 +84,20 @@ public class EventController extends Controller {
 	}
 
 	public Result updateEvent(Long id) {
+		Form<Event> f = formFactory.form(Event.class).bindFromRequest();
+		if(f.hasErrors()){
+			//TODO create different types of error for json and xml
+			return Results.badRequest(f.errorsAsJson());
+		}
+		Event event = Event.findById(Long.valueOf(id));
+		if (event == null) {
+			return Results.notFound();
+		}
+		event = f.get();
+		event.setId(id);
+		event.update();
 		if (request().accepts("application/json")) {
-			return ok("updateEventJSON");
+			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
 			return ok("updateEventXML");
 		} else {

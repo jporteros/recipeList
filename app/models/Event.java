@@ -24,11 +24,10 @@ public class Event extends BaseModel{
 	
 	/*TODO fix the problem with dates when any find method triggers*/
 	//private List<Date> dates;
-	
 	@Required
 	private String description;
 	
-	@Required 
+	@Required
 	private String type;
 	
 	//@Required
