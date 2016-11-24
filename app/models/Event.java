@@ -4,8 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import javax.persistence.*;
-import javax.swing.text.DateFormatter;
-
 import play.data.format.*;
 
 import javax.validation.Valid;
@@ -39,8 +37,6 @@ public class Event extends BaseModel {
 	private Organiser organiser;
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
-	// @JsonIgnore
-	/* TODO ask for the Behaviour of @Valid when applied to items in a List */
 	public List<Comment> eventComments;
 
 	private static final Find<Long, Event> find = new Find<Long, Event>() {
@@ -52,7 +48,7 @@ public class Event extends BaseModel {
 
 	public static List<Event> findPage(Integer page) {
 		/* First events will be shown in page 0 */
-		/* TODO order by date */
+		/* TODO order by date, get comments ordered*/
 		return find.setFirstRow((page * eventsPerPage))
 				.setMaxRows(eventsPerPage).findList();
 	}
@@ -106,6 +102,7 @@ public class Event extends BaseModel {
 		this.eventDate = eventDate;
 	}
 	
+	/*JSON Utility*/
 	public JsonNode toJson() {
 		ObjectNode node = (ObjectNode) Json.toJson(this);
 		node.put("eventDate", df.format(eventDate));

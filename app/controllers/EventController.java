@@ -121,7 +121,7 @@ public class EventController extends Controller {
 		event.save();
 		
 		if (request().accepts("application/json")) {
-			return ok("commentEventJSON"+event.toJson());
+			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
 			return ok("commentEventXML");
 		} else {
