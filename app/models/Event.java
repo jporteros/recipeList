@@ -23,7 +23,7 @@ public class Event extends BaseModel {
 	private String name;
 
 	@Formats.DateTime(pattern = "dd-MM-yyyy HH:mm:SSS")
-	public Date eventDate = new Date();
+	public Date eventDate = null;
 
 	@Required
 	private String description;
@@ -117,7 +117,9 @@ public class Event extends BaseModel {
 	/*JSON Utility*/
 	public JsonNode toJson() {
 		ObjectNode node = (ObjectNode) Json.toJson(this);
-		node.put("eventDate", df.format(eventDate));
+		if(eventDate!=null){
+			node.put("eventDate", df.format(eventDate));
+		}
 		return node;
 	}
 

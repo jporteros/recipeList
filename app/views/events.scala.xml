@@ -1,0 +1,6 @@
+@(events:List[models.Event])
+<events>
+@for(e <- events){
+@event(e)
+}
+</events>

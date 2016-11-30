@@ -17,6 +17,7 @@ import play.db.ebean.Transactional;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.Results;
+import play.twirl.api.Content;
 
 public class EventController extends Controller {
 	@Inject
@@ -30,7 +31,8 @@ public class EventController extends Controller {
 		if (request().accepts("application/json")) {
 			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
-			return ok("getEventXML");
+			Content content = views.xml.event.render(event);
+			return ok(content);
 		} else {
 			return ok("getEventNotAcceptable");
 		}
@@ -43,7 +45,8 @@ public class EventController extends Controller {
 		if (request().accepts("application/json")) {
 			return ok(EventController.createEventListNode(events));
 		} else if (request().accepts("application/xml")) {
-			return ok("listEventsXML");
+			Content content = views.xml.events.render(events);
+			return ok(content);
 		} else {
 			return ok("listEventsNotAcceptable");
 		}
@@ -58,7 +61,8 @@ public class EventController extends Controller {
 			if (request().accepts("application/json")) {
 				return ok("removeEventJSON");
 			} else if (request().accepts("application/xml")) {
-				return ok("removeEventXML");
+				Content content = views.xml.event.render(event);
+				return ok(content);
 			} else {
 				return ok("removeEventNotAcceptable");
 			}
@@ -78,7 +82,8 @@ public class EventController extends Controller {
 		if (request().accepts("application/json")) {
 			return Results.status(CREATED, event.toJson());
 		} else if (request().accepts("application/xml")) {
-			return ok("createEventXML");
+			Content content = views.xml.event.render(event);
+			return ok(content);
 		} else {
 			return ok("createEventNotAcceptable");
 		}
@@ -100,7 +105,8 @@ public class EventController extends Controller {
 		if (request().accepts("application/json")) {
 			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
-			return ok("updateEventXML");
+			Content content = views.xml.event.render(event);
+			return ok(content);
 		} else {
 			return ok("updateEventNotAcceptable");
 		}
@@ -124,7 +130,8 @@ public class EventController extends Controller {
 		if (request().accepts("application/json")) {
 			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
-			return ok("commentEventXML");
+			Content content = views.xml.event.render(event);
+			return ok(content);
 		} else {
 			return ok("commentEventNotAcceptable");
 		}
@@ -162,7 +169,8 @@ public class EventController extends Controller {
 		if (request().accepts("application/json")) {
 			return ok(event.toJson());
 		} else if (request().accepts("application/xml")) {
-			return ok("commentEventXML");
+			Content content = views.xml.event.render(event);
+			return ok(content);
 		} else {
 			return ok("commentEventNotAcceptable");
 		}

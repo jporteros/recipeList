@@ -1,0 +1,37 @@
+
+@(event: Event)
+
+<event id="@event.getId()">
+	<name>@event.getName()</name>
+	<description>@event.getDescription()</description>
+	<organiser id="@event.getOrganiser().getId()">
+		<name>@event.getOrganiser().getName()</name>
+		<surname>@event.getOrganiser().getSurname()</surname>
+		<email>@event.getOrganiser().getEmail()</email>
+	</organiser>
+	<type>@event.getType()</type>
+	@if(event.getEventDate() != null){
+	<eventDate>@event.getEventDate()</eventDate>
+	}
+	@if(!event.getEventTags().isEmpty()){
+	<eventTags>
+		@for(tag <- event.getEventTags()){
+		<tag id="@tag.getId()">
+			<name>@tag.getName()</name>
+		</tag>
+		}
+	</eventTags>
+	}
+	@if(!event.getEventComments().isEmpty()){
+	<eventComments>
+		@for(comment <- event.getEventComments()){
+		<comment id="@comment.getId()">
+			<date>@comment.getDate()</date>
+			<stars>@comment.getStars()</stars>
+			<author>@comment.getAuthor()</author>
+			<body>@comment.getBody()</body>
+		</comment>
+		}
+	</eventComments>
+	}
+</event>
