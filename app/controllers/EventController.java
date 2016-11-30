@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.Comment;
 import models.Event;
+import models.Tag;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.ebean.Transactional;
@@ -129,6 +130,44 @@ public class EventController extends Controller {
 		}
 	}
 
+	@Transactional
+	public Result addTagToEvent(Long id) {
+		Form<Tag> f = formFactory.form(Tag.class).bindFromRequest();
+		if (f.hasErrors()) {
+			//TODO create different types of error for Json and XML
+			return Results.badRequest(f.errorsAsJson());
+		}
+		Event event = Event.findById(id);
+		if(event == null)
+			return notFound();
+		Tag tag=f.get();
+		Tag aux = Tag.findByName(tag.getName());
+		if( aux == null){
+			event.getEventTags().add(tag);
+			tag.getEvents().add(event);
+		}
+		else{
+			System.out.println("Antes contains");
+			if(!event.eventTags.contains(aux)){
+				event.getEventTags().add(aux);
+				aux.getEvents().add(event);	
+			}
+			else{
+				//TODO AÑADIR FLAG
+				return ok("ya contiene el tag");
+			}
+			System.out.println("Despues contains");
+		}
+		event.save();
+		if (request().accepts("application/json")) {
+			return ok(event.toJson());
+		} else if (request().accepts("application/xml")) {
+			return ok("commentEventXML");
+		} else {
+			return ok("commentEventNotAcceptable");
+		}
+	}
+	
 	public static ObjectNode createEventListNode(List<Event> events) {
 		ArrayNode array = play.libs.Json.newArray();
 		ObjectNode node = play.libs.Json.newObject();

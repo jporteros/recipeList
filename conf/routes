@@ -33,6 +33,10 @@ POST		/events						controllers.EventController.createEvent
 
 PUT		/event/:id						controllers.EventController.updateEvent(id: Long)
 
-# Comment an event
+# Comment event
 
 POST /event/:id/comment						controllers.EventController.commentEvent(id: Long)
+
+# Add tag to event
+
+POST /event/:id/addTag					controllers.EventController.addTagToEvent(id: Long)

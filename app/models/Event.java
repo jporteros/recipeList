@@ -38,7 +38,10 @@ public class Event extends BaseModel {
 
 	@OneToMany(cascade = CascadeType.ALL, mappedBy = "event")
 	public List<Comment> eventComments;
-
+	
+	@ManyToMany(cascade= CascadeType.ALL)
+	public List<Tag> eventTags = new ArrayList<Tag>();
+	
 	private static final Find<Long, Event> find = new Find<Long, Event>() {
 	};
 
@@ -54,8 +57,17 @@ public class Event extends BaseModel {
 	}
 
 	/* GETTERS AND SETTERS */
+	
 	public List<Comment> getEventComments() {
 		return eventComments;
+	}
+
+	public List<Tag> getEventTags() {
+		return eventTags;
+	}
+
+	public void setEventTags(List<Tag> tags) {
+		this.eventTags = tags;
 	}
 
 	public void setEventComments(List<Comment> eventComment) {

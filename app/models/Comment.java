@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.Valid;
 
-import com.avaje.ebean.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import play.data.validation.Constraints.Max;
 import play.data.validation.Constraints.Min;
@@ -55,6 +55,10 @@ public class Comment extends BaseModel {
 
 	public void setBody(String body) {
 		this.body = body;
+	}
+
+	public Event getEvent() {
+		return event;
 	}
 
 	public void setEvent(Event event) {
