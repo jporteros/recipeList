@@ -120,6 +120,12 @@ public class Event extends BaseModel {
 		if(eventDate!=null){
 			node.put("eventDate", df.format(eventDate));
 		}
+		if( this.getEventComments().size()==0){
+			node.remove("eventComments");
+		}
+		if( this.getEventTags().size()==0){
+			node.remove("eventTags");
+		}
 		return node;
 	}
 

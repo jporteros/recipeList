@@ -5,12 +5,15 @@ import java.util.List;
 import javax.inject.Inject;
 
 import com.avaje.ebean.Ebean;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import models.Comment;
 import models.Event;
 import models.Tag;
+import play.cache.CacheApi;
+import play.cache.Cached;
 import play.data.Form;
 import play.data.FormFactory;
 import play.db.ebean.Transactional;
@@ -22,16 +25,32 @@ import play.twirl.api.Content;
 public class EventController extends Controller {
 	@Inject
 	FormFactory formFactory;
-
+	@Inject
+	private CacheApi cache;
+	
 	public Result getEvent(Long id) {
-		Event event = Event.findById(id);
-		if (event == null)
-			return notFound();
-
+		
+		//añadimos la cache
+		Event event = cache.get("event-"+id);
+		if(event == null){
+			event = Event.findById(id);
+			if (event == null)
+				return notFound();
+			cache.set("event-"+id, event);
+		}
 		if (request().accepts("application/json")) {
-			return ok(event.toJson());
+			JsonNode node= cache.get("event-"+id+"-json");
+			if(node==null){
+				node= event.toJson();
+				cache.set("event-"+id+"-json", node);
+			}
+			return ok(node);
 		} else if (request().accepts("application/xml")) {
-			Content content = views.xml.event.render(event);
+			Content content = cache.get("event-"+id+"-xml");
+			if(content==null){
+				content = views.xml.event.render(event);
+				cache.set("event-"+id+"-xml", content);
+			}
 			return ok(content);
 		} else {
 			return ok("getEventNotAcceptable");
@@ -39,13 +58,28 @@ public class EventController extends Controller {
 	}
 
 	public Result listEvents(Integer page) {
-		List<Event> events = Event.findPage(page);
+		List<Event> events= cache.get("events+"+page);
+		if(events == null){
+			events = Event.findPage(page);
+			if (events == null)
+				return notFound();
+			cache.set("events+"+page,events,60);//expira en 1 min
+		}
 		if (events == null)
 			return notFound();
 		if (request().accepts("application/json")) {
-			return ok(EventController.createEventListNode(events));
+			ObjectNode node = cache.get("events-"+page+"-json");
+			if(node==null){
+				node= EventController.createEventListNode(events);
+				cache.set("events-"+page+"-json",node,60);
+			}
+			return ok(node);
 		} else if (request().accepts("application/xml")) {
-			Content content = views.xml.events.render(events);
+			Content content = cache.get("events-"+page+"-xml");
+			if(content==null){
+				content = views.xml.events.render(events);
+				cache.set("events-"+page+"-xml", content,60);
+			}
 			return ok(content);
 		} else {
 			return ok("listEventsNotAcceptable");
@@ -53,16 +87,20 @@ public class EventController extends Controller {
 	}
 
 	public Result removeEvent(Long id) {
-		Event event = Event.findById(Long.valueOf(id));
-		if (event == null) {
-			return Results.notFound();
+	
+		Event event = cache.get("event-"+id);
+		if(event==null){
+			event = Event.findById(Long.valueOf(id));
+			if (event == null) 
+				return Results.notFound();
 		}
+		
 		if (event.delete()) {
+			cache.remove("event-"+id);
 			if (request().accepts("application/json")) {
 				return ok("removeEventJSON");
 			} else if (request().accepts("application/xml")) {
-				Content content = views.xml.event.render(event);
-				return ok(content);
+				return ok("removeEventXML");
 			} else {
 				return ok("removeEventNotAcceptable");
 			}
@@ -95,17 +133,24 @@ public class EventController extends Controller {
 			//TODO create different types of error for json and xml
 			return Results.badRequest(f.errorsAsJson());
 		}
-		Event event = Event.findById(Long.valueOf(id));
-		if (event == null) {
-			return Results.notFound();
+		Event event = cache.get("event-"+id);
+		if(event==null){
+			event = Event.findById(Long.valueOf(id));
+			if (event == null) 
+				return Results.notFound();
 		}
 		event = f.get();
 		event.setId(id);
 		event.update();
+		cache.set("event-"+id, event);
 		if (request().accepts("application/json")) {
-			return ok(event.toJson());
+			JsonNode node= event.toJson();
+			cache.set("event-"+id+"-json", node);
+			
+			return ok(node);
 		} else if (request().accepts("application/xml")) {
 			Content content = views.xml.event.render(event);
+			cache.set("event-"+id+"-xml", content);
 			return ok(content);
 		} else {
 			return ok("updateEventNotAcceptable");
@@ -119,18 +164,31 @@ public class EventController extends Controller {
 			//TODO create different types of error for Json and XML
 			return Results.badRequest(f.errorsAsJson());
 		}
-		Event event = Event.findById(id);
-		if(event == null)
-			return notFound();
+		Event event = cache.get("event-"+id);
+		if(event == null){
+			event = Event.findById(id);
+			if (event == null)
+				return notFound();
+			cache.set("event-"+id, event);
+		}
 		Comment comment=f.get();
 		event.getEventComments().add(comment);
 		comment.setEvent(event);
 		event.save();
-		
+		cache.set("event-"+id, event);
 		if (request().accepts("application/json")) {
-			return ok(event.toJson());
+			JsonNode node= cache.get("event-"+id+"-json");
+			if(node==null){
+				node= event.toJson();
+				cache.set("event-"+id+"-json", node);
+			}
+			return ok(node);
 		} else if (request().accepts("application/xml")) {
-			Content content = views.xml.event.render(event);
+			Content content = cache.get("event-"+id+"-xml");
+			if(content==null){
+				content = views.xml.event.render(event);
+				cache.set("event-"+id+"-xml", content);
+			}
 			return ok(content);
 		} else {
 			return ok("commentEventNotAcceptable");
@@ -144,9 +202,13 @@ public class EventController extends Controller {
 			//TODO create different types of error for Json and XML
 			return Results.badRequest(f.errorsAsJson());
 		}
-		Event event = Event.findById(id);
-		if(event == null)
-			return notFound();
+		Event event = cache.get("event-"+id);
+		if(event == null){
+			event = Event.findById(id);
+			if (event == null)
+				return notFound();
+			
+		}
 		Tag tag=f.get();
 		Tag aux = Tag.findByName(tag.getName());
 		if( aux == null){
@@ -154,7 +216,6 @@ public class EventController extends Controller {
 			tag.getEvents().add(event);
 		}
 		else{
-			System.out.println("Antes contains");
 			if(!event.eventTags.contains(aux)){
 				event.getEventTags().add(aux);
 				aux.getEvents().add(event);	
@@ -163,16 +224,25 @@ public class EventController extends Controller {
 				//TODO AÑADIR FLAG
 				return ok("ya contiene el tag");
 			}
-			System.out.println("Despues contains");
 		}
 		event.save();
+		cache.set("event-"+id, event);
 		if (request().accepts("application/json")) {
-			return ok(event.toJson());
+			JsonNode node= cache.get("event-"+id+"-json");
+			if(node==null){
+				node= event.toJson();
+				cache.set("event-"+id+"-json", node);
+			}
+			return ok(node);
 		} else if (request().accepts("application/xml")) {
-			Content content = views.xml.event.render(event);
+			Content content = cache.get("event-"+id+"-xml");
+			if(content==null){
+				content = views.xml.event.render(event);
+				cache.set("event-"+id+"-xml", content);
+			}
 			return ok(content);
 		} else {
-			return ok("commentEventNotAcceptable");
+			return ok("addTagNotAcceptable");
 		}
 	}
 	
