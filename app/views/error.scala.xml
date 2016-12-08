@@ -1,0 +1,6 @@
+@import play.i18n._
+@(t:Integer, message:String)
+<error>
+<@Messages.get("errortype")>@t</@Messages.get("errortype")>
+<@Messages.get("errormessage")>@message</@Messages.get("errormessage")>
+</error>
