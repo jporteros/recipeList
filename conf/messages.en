@@ -4,6 +4,4 @@ notacceptable=The server can only generate a response that is not accepted by th
 internalservererror=Unexpected condition was encountered, try it later.
 badrequest=The request cannot be fulfilled due to bad syntax, check the request fields.
 eventcontainstag=The event contains this tag already.
-errortype=type
-errormessage= message
 eventremoved=event removed

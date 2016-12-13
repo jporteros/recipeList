@@ -4,6 +4,4 @@ notacceptable=El servidor no es capaz de devolver los datos en ninguno de los fo
 internalservererror=Error inesperado, intentelo mas tarde.
 badrequest=La solicitud contiene sintaxis errónea, comprueba los campos de la petición.
 eventcontainstag=El evento ya contiene el tag.
-errortype=tipo
-errormessage=mensaje
 eventremoved= evento eliminado

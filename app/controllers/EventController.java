@@ -34,7 +34,7 @@ public class EventController extends Controller {
 	private CacheApi cache;
 	
 	public Result getEvent(Long id) {
-		//añadimos la cache
+		//Add cache
 		Event event = cache.get("event-"+id);
 		if(event == null){
 			event = Event.findById(id);
@@ -282,8 +282,6 @@ public class EventController extends Controller {
 			return JsonHelper.getErrorResult(3);
 		}
 	}
-	
-	
 	
 	public static ObjectNode createEventListNode(List<Event> events) {
 		ArrayNode array = play.libs.Json.newArray();

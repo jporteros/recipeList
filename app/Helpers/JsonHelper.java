@@ -12,8 +12,8 @@ public class JsonHelper {
 	public static JsonNode getErrorJson(String errorType,int errorCode){
 		
 		ObjectNode error = play.libs.Json.newObject(); 
-		error.put(Messages.get("errortype"), errorCode);
-		error.put(Messages.get("errormessage"), Messages.get(errorType));
+		error.put("type", errorCode);
+		error.put("message", Messages.get(errorType));
 		return error;
 	}
 
