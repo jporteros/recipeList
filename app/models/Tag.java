@@ -13,7 +13,6 @@ import play.data.validation.Constraints.Required;
 @Entity
 public class Tag extends BaseModel{
 	
-	
 	@Required
 	private String name;
 	

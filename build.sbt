@@ -13,3 +13,4 @@ libraryDependencies ++= Seq(
 )
 enablePlugins(PlayEbean)
 libraryDependencies += evolutions
+libraryDependencies += "org.postgresql" % "postgresql" % "9.4-1206-jdbc42"

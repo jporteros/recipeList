@@ -51,7 +51,6 @@ public class Event extends BaseModel {
 
 	public static List<Event> findPage(Integer page) {
 		/* First events will be shown in page 0 */
-		/* TODO order by date, get comments ordered*/
 		return find.setFirstRow((page * eventsPerPage))
 				.setMaxRows(eventsPerPage).findList();
 	}
