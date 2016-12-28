@@ -4,7 +4,7 @@
 # --- !Ups
 
 create table comment (
-  id                            bigint not null,
+  id                            bigserial not null,
   author                        varchar(255),
   stars                         integer,
   body                          varchar(255),
@@ -14,10 +14,9 @@ create table comment (
   when_update                   timestamp not null,
   constraint pk_comment primary key (id)
 );
-create sequence comment_seq;
 
 create table event (
-  id                            bigint not null,
+  id                            bigserial not null,
   name                          varchar(255),
   event_date                    timestamp,
   description                   varchar(255),
@@ -29,7 +28,6 @@ create table event (
   constraint uq_event_organiser_id unique (organiser_id),
   constraint pk_event primary key (id)
 );
-create sequence event_seq;
 
 create table event_tag (
   event_id                      bigint not null,
@@ -38,7 +36,7 @@ create table event_tag (
 );
 
 create table organiser (
-  id                            bigint not null,
+  id                            bigserial not null,
   name                          varchar(255),
   surname                       varchar(255),
   email                         varchar(255),
@@ -47,17 +45,15 @@ create table organiser (
   when_update                   timestamp not null,
   constraint pk_organiser primary key (id)
 );
-create sequence organiser_seq;
 
 create table tag (
-  id                            bigint not null,
+  id                            bigserial not null,
   name                          varchar(255),
   version                       bigint not null,
   when_created                  timestamp not null,
   when_update                   timestamp not null,
   constraint pk_tag primary key (id)
 );
-create sequence tag_seq;
 
 alter table comment add constraint fk_comment_event_id foreign key (event_id) references event (id) on delete restrict on update restrict;
 create index ix_comment_event_id on comment (event_id);
@@ -73,28 +69,24 @@ create index ix_event_tag_tag on event_tag (tag_id);
 
 # --- !Downs
 
-alter table comment drop constraint if exists fk_comment_event_id;
+alter table if exists comment drop constraint if exists fk_comment_event_id;
 drop index if exists ix_comment_event_id;
 
-alter table event drop constraint if exists fk_event_organiser_id;
+alter table if exists event drop constraint if exists fk_event_organiser_id;
 
-alter table event_tag drop constraint if exists fk_event_tag_event;
+alter table if exists event_tag drop constraint if exists fk_event_tag_event;
 drop index if exists ix_event_tag_event;
 
-alter table event_tag drop constraint if exists fk_event_tag_tag;
+alter table if exists event_tag drop constraint if exists fk_event_tag_tag;
 drop index if exists ix_event_tag_tag;
 
-drop table if exists comment;
-drop sequence if exists comment_seq;
+drop table if exists comment cascade;
 
-drop table if exists event;
-drop sequence if exists event_seq;
+drop table if exists event cascade;
 
-drop table if exists event_tag;
+drop table if exists event_tag cascade;
 
-drop table if exists organiser;
-drop sequence if exists organiser_seq;
+drop table if exists organiser cascade;
 
-drop table if exists tag;
-drop sequence if exists tag_seq;
+drop table if exists tag cascade;
 

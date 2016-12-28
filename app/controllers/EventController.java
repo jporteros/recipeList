@@ -80,7 +80,7 @@ public class EventController extends Controller {
 		List<Event> events= cache.get("events+"+page);
 		if(events == null){
 			events = Event.findPage(page);
-			if (events == null)
+			if (events.size()==0)
 				return sendError(2);
 			cache.set("events+"+page,events,CACHE_TIMEOUT);//expira en 1 min
 		}
@@ -116,7 +116,7 @@ public class EventController extends Controller {
 			cache.remove("event-"+id);
 			if (request().accepts("application/json")) {
 				ObjectNode node =  play.libs.Json.newObject(); 
-				node.put(Messages.get("errormessage"), Messages.get("eventremoved"));
+				node.put("message", Messages.get("eventremoved"));
 				return ok(node);
 			} else if (request().accepts("application/xml")) {
 				Content content = views.xml.message.render(Messages.get("eventremoved"));
@@ -238,7 +238,7 @@ public class EventController extends Controller {
 		else{
 			int variable=0;
 			for(Tag t:event.eventTags){
-				if(t.getName()==aux.getName()){
+				if(t.getName().equalsIgnoreCase(aux.getName())){
 					variable=1;
 					break;
 				}
@@ -252,7 +252,6 @@ public class EventController extends Controller {
 			}
 		}
 		event.save();
-		System.out.println(event.eventTags +"y la operacion");
 		cache.set("event-"+id, event,CACHE_TIMEOUT);
 		if (request().accepts("application/json")) {
 				JsonNode node= event.toJson();
